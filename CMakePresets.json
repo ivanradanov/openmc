@@ -120,6 +120,14 @@
             }
         },
         {
+            "name": "llvm_mi50",
+            "inherits": ["llvm"],
+            "displayName": "LLVM Clang MI50",
+            "environment": {
+                "PRESET_CXX_FLAGS": "-fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906"
+            }
+        },
+        {
             "name": "llvm_mi250",
             "inherits": ["llvm"],
             "displayName": "LLVM Clang MI250 and MI250X",
