@@ -32,6 +32,17 @@
             }
         },
         {
+            "name": "llvm-nu",
+            "inherits": ["base"],
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            },
+            "environment": {
+                "LLVM_CXX_FLAGS": "-fopenmp -fopenmp-cuda-mode"
+            }
+        },
+        {
             "name": "llvm",
             "inherits": ["unity"],
             "cacheVariables": {
@@ -117,6 +128,14 @@
             "displayName": "LLVM Clang MI100",
             "environment": {
                 "PRESET_CXX_FLAGS": "-fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx908"
+            }
+        },
+        {
+            "name": "llvm_mi50_nu",
+            "inherits": ["llvm-nu"],
+            "displayName": "LLVM Clang MI50",
+            "environment": {
+                "PRESET_CXX_FLAGS": "-fopenmp-targets=amdgcn-amd-amdhsa -Xopenmp-target=amdgcn-amd-amdhsa -march=gfx906"
             }
         },
         {
