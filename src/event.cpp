@@ -175,24 +175,7 @@ void process_init_events(int n_particles)
   #pragma omp target teams distribute parallel for
   for (int i = 0; i < n_particles; i++) {
     initialize_history(simulation::device_particles[i], i + 1);
-    dispatch_xs_event(i);
   }
-
-  // The loop below can in theory be combined with the one above,
-  // but is present here as a compiler bug workaround
-  #pragma omp target teams distribute parallel for reduction(+:total_weight)
-  for (int i = 0; i < n_particles; i++) {
-    total_weight += simulation::device_particles[i].wgt_;
-  }
-  simulation::time_event_init.stop();
-
-  // Write total weight to global variable
-  simulation::total_weight = total_weight;
-
-  simulation::calculate_fuel_xs_queue.sync_size_device_to_host();
-  simulation::calculate_nonfuel_xs_queue.sync_size_device_to_host();
-  simulation::advance_particle_queue.sync_size_device_to_host();
-
 }
 
 bool depletion_rx_check()

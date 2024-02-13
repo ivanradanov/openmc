@@ -874,79 +874,8 @@ void transport_event_based()
   // Initialize in-flight particles
   process_init_events(n_particles);
 
-  int event = 0;
+  exit(1);
 
-  // Event-based transport loop
-  while (true) {
-    // Determine which event kernel has the longest queue
-    int64_t max = std::max({
-      simulation::calculate_fuel_xs_queue.size(),
-      simulation::calculate_nonfuel_xs_queue.size(),
-      simulation::advance_particle_queue.size(),
-      simulation::surface_crossing_queue.size(),
-      simulation::revival_queue.size(),
-      simulation::collision_queue.size()});
-
-    // Determine which event kernel has the longest queue (not including the fuel XS lookup queue)
-    int64_t max_other_than_fuel_xs = std::max({
-      simulation::calculate_nonfuel_xs_queue.size(),
-      simulation::advance_particle_queue.size(),
-      simulation::surface_crossing_queue.size(),
-      simulation::revival_queue.size(),
-      simulation::collision_queue.size()});
-
-    // Require the fuel XS lookup event to be more full to run as compared to other events
-    // This is motivated by this event having more benefit to running with more particles
-    // due to the particle energy sort.
-    if ( static_cast<double>(max) < settings::fuel_lookup_bias * static_cast<double>(max_other_than_fuel_xs) )
-      max = max_other_than_fuel_xs;
-
-    // Execute event with the longest queue (or revival queue if the revival period is reached)
-    if (max == 0) {
-      break;
-    } else if (max == simulation::revival_queue.size() || ( simulation::revival_queue.size() > 0 && event % max_revival_period == 0 )) {
-      process_revival_events();
-    } else if (max == simulation::calculate_fuel_xs_queue.size()) {
-      process_calculate_xs_events_fuel();
-    } else if (max == simulation::calculate_nonfuel_xs_queue.size()) {
-      process_calculate_xs_events_nonfuel();
-    } else if (max == simulation::advance_particle_queue.size()) {
-      process_advance_particle_events();
-    } else if (max == simulation::surface_crossing_queue.size()) {
-      process_surface_crossing_events();
-    } else if (max == simulation::collision_queue.size()) {
-      process_collision_events();
-    }
-
-    event++;
-
-    /*
-    // Check if the maximum number of lost particles has been reached
-    #pragma omp target update from(simulation::n_lost_particles)
-    if (simulation::n_lost_particles >= settings::max_lost_particles &&
-        simulation::n_lost_particles >= settings::rel_max_lost_particles * simulation::work_per_rank * simulation::current_batch * settings::gen_per_batch) {
-      fatal_error("Too many particles have been lost.");
-    }
-    */
-  }
-
-  // Execute death event for all particles
-  process_death_events(n_particles);
-
-  // Copy back fission bank to host
-  simulation::fission_bank.copy_device_to_host();
-  
-  // Transfer tally data back to host for host-side accumulation
-  if (!model::active_tracklength_tallies.empty()) {
-    for (int i = 0; i < model::tallies_size; ++i) {
-      auto& tally = model::tallies[i];
-      tally.update_device_to_host();
-    }
-  }
-
-  #ifdef OPENMC_MPI
-  MPI_Barrier( mpi::intracomm );
-  #endif
 }
 
 } // namespace openmc
