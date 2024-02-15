@@ -109,35 +109,6 @@ Particle::from_source(const Bank& src)
 {
   // Reset some attributes
   this->clear();
-  surface_ = 0;
-  cell_born_ = C_NONE;
-  material_ = C_NONE;
-  n_collision_ = 0;
-  fission_ = false;
-  //std::fill(flux_derivs_.begin(), flux_derivs_.end(), 0.0);
-  std::fill(flux_derivs_, flux_derivs_ + FLUX_DERIVS_SIZE, 0.0);
-
-  // Copy attributes from source bank site
-  type_ = src.particle;
-  wgt_ = src.wgt;
-  wgt_last_ = src.wgt;
-  this->r() = src.r;
-  this->u() = src.u;
-  r_last_current_ = src.r;
-  r_last_ = src.r;
-  u_last_ = src.u;
-  if (settings::run_CE) {
-    E_ = src.E;
-    g_ = 0;
-  } else {
-    printf("Error - MG mode not supported yet on device.\n");
-    /*
-    g_ = static_cast<int>(src.E);
-    g_last_ = static_cast<int>(src.E);
-    E_ = data::mg.energy_bin_avg_[g_];
-    */
-  }
-  E_last_ = E_;
 }
 
 bool

@@ -506,66 +506,6 @@ double initialize_history(Particle& p, int index_source)
 {
   // Initialize eigenvalue or fixed source particles from primary source bank
   p.from_source(simulation::device_source_bank[index_source - 1]);
-  
-    /*
-  else if (settings::run_mode == RunMode::FIXED_SOURCE) {
-    // initialize random number seed
-    int64_t id = (simulation::total_gen + overall_generation() - 1)*settings::n_particles +
-      simulation::device_work_index[mpi::rank] + index_source;
-    uint64_t seed = init_seed(id, STREAM_SOURCE);
-    // sample from external source distribution or custom library then set
-    auto site = sample_external_source(&seed);
-    p.from_source(site);
-  }
-    */
-  p.current_work_ = index_source;
-
-  // set identifier for particle
-  p.id_ = simulation::device_work_index[mpi::rank] + index_source;
-
-  // set progeny count to zero
-  p.n_progeny_ = 0;
-
-  // Reset particle event counter
-  p.n_event_ = 0;
-
-  // set random number seed
-  int64_t particle_seed = (simulation::total_gen + overall_generation() - 1)
-    * settings::n_particles + p.id_;
-  init_particle_seeds(particle_seed, p.seeds_);
-
-  // set particle trace
-  p.trace_ = false;
-  /*
-  if (simulation::current_batch == settings::trace_batch &&
-      simulation::current_gen == settings::trace_gen &&
-      p.id_ == settings::trace_particle) p.trace_ = true;
-  */
-
-  // Set particle track.
-  p.write_track_ = false;
-  /*
-  if (settings::write_all_tracks) {
-    p.write_track_ = true;
-  } else if (settings::track_identifiers.size() > 0) {
-    for (const auto& t : settings::track_identifiers) {
-      if (simulation::current_batch == t[0] &&
-          simulation::current_gen == t[1] &&
-          p.id_ == t[2]) {
-        p.write_track_ = true;
-        break;
-      }
-    }
-  }
-
-  // Display message if high verbosity or trace is on
-  if (settings::verbosity >= 9 || p.trace_) {
-    write_message("Simulating Particle {}", p.id_);
-  }
-  */
-
-  initialize_history_partial(p);
-
   return p.wgt_;
 }
 

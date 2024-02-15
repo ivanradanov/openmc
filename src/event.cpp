@@ -174,7 +174,7 @@ void process_init_events(int n_particles)
 
   #pragma omp target teams distribute parallel for
   for (int i = 0; i < n_particles; i++) {
-    initialize_history(simulation::device_particles[i], i + 1);
+    simulation::device_particles[i].n_coord_ = 1;
   }
 }
 
